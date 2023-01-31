@@ -28,6 +28,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1db1ccb3-4442-4bf6-8664-fdefda9c7a85"
+      }
+    },
+    "owner": "hamzagulraiz"
   }
 }
