@@ -33,6 +33,7 @@ const styles = StyleSheet.create({
   value: {
     alignItems: 'flex-end',
     marginHorizontal: wp(4),
+    height: hp(30),
   },
   screenText: {
     fontSize: fontsizes.px_20,

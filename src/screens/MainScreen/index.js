@@ -7,22 +7,112 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import Row from '../../row/Row';
 import styles from './styles';
 import icons from '../../assets/icons/icons';
 import colors from '../../assets/colors/colors';
 import CustomButton from '../../components/Button/Button';
+import {widthPercentageToDP} from 'react-native-responsive-screen';
 
 const STYLES = ['default', 'light-content', 'dark-content'];
-
 const MainScreen = () => {
-  const [statusBarStyle, setStatusBarStyle] = useState(STYLES[0]);
+  const [initialState, setInitialState] = useState({
+    currentValue: '0',
+    operator: null,
+    previousValue: null,
+  });
   const [themeIcon, setThemeIcon] = useState(true);
-  const [number, setNumber] = useState(5);
-  // const [statusBarTransition, setStatusBarTransition] = useState(
-  //   TRANSITIONS[0],
-  // );
+  const handleNumber = value => {
+    if (initialState.currentValue.length < 6) {
+      if (initialState.currentValue === '0') {
+        setInitialState(prevState => ({
+          ...prevState,
+          currentValue: `${value}`,
+        }));
+      } else {
+        setInitialState(prevState => ({
+          ...prevState,
+          currentValue: `${initialState.currentValue}${value}`,
+        }));
+      }
+    } else {
+      console.log('reached limit');
+    }
+  };
+
+  const calculator = (type, value) => {
+    switch (type) {
+      case 'number':
+        handleNumber(value);
+        break;
+      case 'clear':
+        setInitialState({
+          currentValue: '0',
+          operator: null,
+          previousValue: null,
+        });
+        break;
+      case 'posneg':
+        setInitialState({
+          currentValue: `${parseFloat(initialState.currentValue) * -1}`,
+        });
+        break;
+      case 'percentage':
+        setInitialState({
+          currentValue: `${parseFloat(initialState.currentValue) * 0.01}`,
+        });
+        break;
+      case 'operator':
+        setInitialState({
+          currentValue: '0',
+          operator: value,
+          previousValue: initialState.currentValue,
+        });
+        break;
+      case 'equal':
+        handleEqual(initialState);
+        break;
+      default:
+        return initialState;
+    }
+  };
+
+  const handleEqual = state => {
+    const {currentValue, previousValue, operator} = state;
+    const current = parseFloat(currentValue);
+    const previous = parseFloat(previousValue);
+    const resetState = {operator: null, previousValue: null};
+
+    switch (operator) {
+      case '+':
+        setInitialState({
+          currentValue: `${previous + current}`,
+          ...resetState,
+        });
+        break;
+      case '-':
+        setInitialState({
+          currentValue: `${previous - current}`,
+          ...resetState,
+        });
+        break;
+      case '*':
+        setInitialState({
+          currentValue: `${previous * current}`,
+          ...resetState,
+        });
+        break;
+      case '/':
+        setInitialState({
+          currentValue: `${previous / current}`,
+          ...resetState,
+        });
+        break;
+      default:
+        return state;
+    }
+  };
 
   return (
     <SafeAreaView
@@ -60,7 +150,7 @@ const MainScreen = () => {
               ...styles.screenText,
               color: themeIcon ? colors.lightBackGround : colors.darkBackGround,
             }}>
-            {number}
+            {parseFloat(initialState.currentValue).toLocaleString()}
           </Text>
         </View>
       </View>
@@ -68,27 +158,27 @@ const MainScreen = () => {
         <Row>
           <CustomButton
             title={'Ac'}
-            onPress={() => {}}
+            onPress={() => calculator('clear')}
             backgroundColor={
               themeIcon ? colors.acButtonDark : colors.acButtonLight
             }
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
           <CustomButton
-            title={'('}
-            onPress={() => {}}
+            title={'+/-'}
+            onPress={() => calculator('posneg')}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
           <CustomButton
-            title={')'}
-            onPress={() => {}}
+            title={'%'}
+            onPress={() => calculator('percentage')}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
           <CustomButton
             title={'/'}
-            onPress={() => {}}
+            onPress={() => calculator('operator', '/')}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
@@ -96,25 +186,25 @@ const MainScreen = () => {
         <Row>
           <CustomButton
             title={'7'}
-            onPress={() => {}}
+            onPress={() => calculator('number', 7)}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
           <CustomButton
             title={'8'}
-            onPress={() => {}}
+            onPress={() => calculator('number', 8)}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
           <CustomButton
             title={'9'}
-            onPress={() => {}}
+            onPress={() => calculator('number', 9)}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
           <CustomButton
             title={'X'}
-            onPress={() => {}}
+            onPress={() => calculator('operator', '*')}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
@@ -122,25 +212,25 @@ const MainScreen = () => {
         <Row>
           <CustomButton
             title={'4'}
-            onPress={() => {}}
+            onPress={() => calculator('number', 4)}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
           <CustomButton
             title={'5'}
-            onPress={() => {}}
+            onPress={() => calculator('number', 5)}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
           <CustomButton
             title={'6'}
-            onPress={() => {}}
+            onPress={() => calculator('number', 6)}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
           <CustomButton
             title={'-'}
-            onPress={() => {}}
+            onPress={() => calculator('operator', '-')}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
@@ -148,25 +238,25 @@ const MainScreen = () => {
         <Row>
           <CustomButton
             title={'1'}
-            onPress={() => {}}
+            onPress={() => calculator('number', 1)}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
           <CustomButton
             title={'2'}
-            onPress={() => {}}
+            onPress={() => calculator('number', 2)}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
           <CustomButton
             title={'3'}
-            onPress={() => {}}
+            onPress={() => calculator('number', 3)}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
           <CustomButton
             title={'+'}
-            onPress={() => {}}
+            onPress={() => calculator('operator', '+')}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
@@ -174,25 +264,20 @@ const MainScreen = () => {
         <Row>
           <CustomButton
             title={'0'}
-            onPress={() => {}}
+            onPress={() => calculator('number', 0)}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
           <CustomButton
             title={'.'}
-            onPress={() => {}}
-            backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
-            color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
-          />
-          <CustomButton
-            title={'back'}
-            onPress={() => {}}
+            onPress={() => calculator('number', '.', initialState)}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
           <CustomButton
             title={'='}
-            onPress={() => {}}
+            onPress={() => calculator('equal', '=')}
+            width={widthPercentageToDP(44.8)}
             backgroundColor={themeIcon ? colors.buttonDark : colors.buttonLight}
             color={themeIcon ? colors.lightBackGround : colors.darkBackGround}
           />
